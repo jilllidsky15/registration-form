@@ -1,0 +1,215 @@
+// add a method to process the form values when the submit button is clicked
+// handleSubmit(event) {
+//     event.preventDefault();
+//     // process form values here
+//   }
+//   add event listener on the form to invoke method on the form submit
+//   <form className="registration" onSubmit={e => this.handleSubmit(e)}>
+
+
+// to get access to the values on the form, use event object or use a special attribute ref
+
+// to use event object, access the form element, which will be stored in in e.target, then you can access
+// the individual inputs by name or id through the form itself
+
+// update handleSubmit method to see the values entered for name and password
+// handleSubmit(event) {
+//     event.preventDefault();
+//     const name = event.target.name.value;
+//     const password = event.target.password.value;
+//     console.log('Name: ', name);
+//     console.log('Password: ', password);
+//   }
+
+// using ref, a ref must be created with React.createRef() method then attached to the input element 
+// using ref attribute
+
+// add a constructor to the component and create a ref for the name input
+// constructor(props) {
+//     super(props);
+//     this.nameInput = React.createRef();
+//   }
+
+// and attach this ref to the element itself
+// <input type="text" className="registration__control"
+//            name="name" id="name" ref={this.nameInput}/>
+
+// update handleSubmit to get the value from this element
+// handleSubmit(event) {
+//     event.preventDefault();
+//     const name = this.nameInput.current.value;
+//     console.log('Name: ', name);
+//   }
+
+// use defaultValue attribute to prepopulate a field with something useful and still allow user to change it
+// <input type="text" className="registration__control"
+//            name="name" id="name" ref={this.nameInput} defaultValue="Frank"/>
+
+
+
+
+// controlled registration form:
+
+// set up the state to store the form values
+// constructor(props) {
+//     super(props);
+//     this.state = {
+//       name: {
+//         value: ''
+//       },
+//       password: {
+//         value: ''
+//       },
+//       repeatPassword: {
+//         value: ''
+//       }
+//     }
+//   }
+
+
+//   create handlers to update the state properties
+//   updateName(name) {
+//     this.setState({name: {value: name}});
+//   }
+  
+//   updatePassword(password) {
+//     this.setState({password: {value: password}});
+//   }
+  
+//   updateRepeatPassword(repeatPassword) {
+//     this.setState({repeatPassword: {value: repeatPassword}});
+//   }
+
+//   add event listeners to the inputs
+// <input type="text" className="registration__control"
+//            name="name" id="name" onChange={e => this.updateName(e.target.value)}/>
+
+// ...
+
+// <input type="password" className="registration__control"
+//            name="password" id="password" onChange={e => this.updatePassword(e.target.value)}/>
+
+// ...
+
+// <input type="password" className="registration__control"
+//            name="repeatPassword" id="repeatPassword" onChange={e => this.updateRepeatPassword(e.target.value)}/>
+
+// check react dev tools to make sure it is working correctly in state (you can see it change as you type)
+
+// refactor handleSubmit to grab values from state instead
+// handleSubmit(event) {
+//     event.preventDefault();
+//     const { name, password, repeatPassword } = this.state;
+
+//     console.log('Name: ', name.value);
+//     console.log('Password: ', password.value);
+//     console.log('Repeat Password: ', repeatPassword.value);
+
+//     // potentially submit these values to the server here
+
+//   }
+
+
+
+
+// validating the form:
+
+// create validation method to perform validation on each of the fields
+
+// validateName() {
+//     const name = this.state.name.value.trim();
+//     if (name.length === 0) {
+//       return 'Name is required';
+//     } else if (name.length < 3) {
+//       return 'Name must be at least 3 characters long';
+//     }
+//   }
+
+//   validatePassword() {
+//     const password = this.state.password.value.trim();
+//     if (password.length === 0) {
+//       return 'Password is required';
+//     } else if (password.length < 6 || password.length > 72) {
+//       return 'Password must be between 6 and 72 characters long';
+//     } else if (!password.match(/[0-9]/)) {
+//       return 'Password must contain at least one number';
+//     }
+//   }
+
+//   validateRepeatPassword() {
+//     const repeatPassword = this.state.repeatPassword.value.trim();
+//     const password = this.state.password.value.trim();
+
+//     if (repeatPassword !== password) {
+//       return 'Passwords do not match';
+//     }
+//   }
+
+// to display a validation message requires a conditional statement. 
+
+//   create a new component ValidationError that accepts a property called message which
+//   contains the validation message to be displayed. if message is a string display the message, otherwise
+//   if it is undefinied, return an empty fragment
+
+//   import React from 'react';
+
+// export default function ValidationError(props) {
+//   if(props.message) {
+//     return (
+//       <div className="error">{props.message}</div>
+//     );
+//   }
+
+//   return <></>
+// }
+
+// import and place it directly below input element for each 
+// <ValidationError message={this.validateName()}/>
+
+
+// when you run the code it shows up before user types anything. to correct, add booleans to the state 
+// which show whether the user has typed anything in the field
+
+// this.state = {
+//     name: {
+//       value: '',
+//       touched: false
+//     },
+//     password: {
+//       value: '',
+//       touched: false
+//     },
+//     repeatPassword: {
+//       value: '',
+//       touched: false
+//     }
+//   };
+
+//   update state setting methods to swtich the touched boolean from false to true when user updates the field.
+//   updateName(name) {
+//     this.setState({name: {value: name, touched: true}});
+//   }
+
+//   conditionally render the validationerror component dependinng on whether the field has been changed by the user
+//   {this.state.name.touched && (
+//     <ValidationError message={nameError} />
+//   )}
+
+//     define in render: 
+//     const nameError = this.validateName();
+//     const passwordError = this.validatePassword();
+//     const repeatPasswordError = this.validateRepeatPassword();
+
+//     use validation methods in the render method to either enable or disable the save button
+
+//     <button
+//   type="submit"
+//   className="registration__button"
+//   disabled={
+//     this.validateName() ||
+//     this.validatePassword() ||
+//     this.validateRepeatPassword()
+//   }
+// >
+//   Save
+// </button>
